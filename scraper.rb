@@ -1,5 +1,6 @@
 #!/bin/env ruby
 # encoding: utf-8
+# frozen_string_literal: true
 
 require 'nokogiri'
 require 'pry'
@@ -10,7 +11,7 @@ OpenURI::Cache.cache_path = '.cache'
 
 class String
   def tidy
-    self.gsub(/[[:space:]]+/, ' ').strip
+    gsub(/[[:space:]]+/, ' ').strip
   end
 end
 
@@ -28,13 +29,13 @@ def scrape_list(url)
     ps = area.xpath('following-sibling::p | following-sibling::h3').slice_before { |e| e.name == 'h3' }.first
     ps.each do |p|
       p.css('a').each do |person|
-        data = { 
-          name: person.text,
+        data = {
+          name:     person.text,
           wikiname: person.attr('class') == 'new' ? '' : person.attr('title'),
-          area: area.css('span').first.text.split('（').first.tidy,
-          term: '12'
+          area:     area.css('span').first.text.split('（').first.tidy,
+          term:     '12',
         }
-        ScraperWiki.save_sqlite([:name, :wikiname, :area], data)
+        ScraperWiki.save_sqlite(%i(name wikiname area), data)
       end
     end
   end
