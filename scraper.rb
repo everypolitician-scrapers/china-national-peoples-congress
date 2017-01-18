@@ -37,4 +37,3 @@ end
 
 ScraperWiki.sqliteexecute('DELETE FROM data') rescue nil
 scrape_list('https://zh.wikipedia.org/wiki/%E7%AC%AC%E5%8D%81%E4%BA%8C%E5%B1%8A%E5%85%A8%E5%9B%BD%E4%BA%BA%E6%B0%91%E4%BB%A3%E8%A1%A8%E5%A4%A7%E4%BC%9A%E4%BB%A3%E8%A1%A8%E5%90%8D%E5%8D%95')
-
