@@ -17,16 +17,16 @@ def scrape_list(url)
   noko = noko_for(url)
 
   section = noko.xpath('//h2[contains(span,"选举单位")]')
-  areas = section.xpath('following-sibling::h2 | following-sibling::h3').slice_before { |e| e.name == 'h2' }.first
+  areas = section.xpath('following-sibling::h2 | following-sibling::dl').slice_before { |e| e.name == 'h2' }.first
 
   areas.each do |area|
-    ps = area.xpath('following-sibling::p | following-sibling::h3').slice_before { |e| e.name == 'h3' }.first
+    ps = area.xpath('following-sibling::p | following-sibling::dl').slice_before { |e| e.name == 'dl' }.first
     ps.each do |p|
       p.css('a').each do |person|
         data = {
           name:     person.text,
           wikiname: person.attr('class') == 'new' ? '' : person.attr('title'),
-          area:     area.css('span').first.text.split('（').first.tidy,
+          area:     area.css('dt').first.text.split('（').first.tidy,
           term:     '12',
         }
         ScraperWiki.save_sqlite(%i(name wikiname area), data)
