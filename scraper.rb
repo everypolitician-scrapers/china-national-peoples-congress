@@ -6,8 +6,6 @@ require 'pry'
 require 'scraped'
 require 'scraperwiki'
 
-require 'open-uri/cached'
-OpenURI::Cache.cache_path = '.cache'
 
 def noko_for(url)
   Nokogiri::HTML(open(url).read)
@@ -29,6 +27,7 @@ def scrape_list(url)
         area:     area.text.split('（').first.tidy,
         term:     '12',
       }
+      puts data.reject { |_, v| v.to_s.empty? }.sort_by { |k, _| k }.to_h if ENV['MORPH_DEBUG']
       ScraperWiki.save_sqlite(%i(name wikiname area), data)
     end
   end
