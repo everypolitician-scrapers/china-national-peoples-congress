@@ -15,22 +15,21 @@ end
 
 def scrape_list(url)
   noko = noko_for(url)
+  section = noko.css('h2').find { |h2| h2.text.include? '选举单位' } or raise "Can't find section"
+  section.xpath('.//preceding::*').remove
 
-  section = noko.xpath('//h2[contains(span,"选举单位")]')
-  areas = section.xpath('following-sibling::h2 | following-sibling::dl').slice_before { |e| e.name == 'h2' }.first
+  section_end = noko.css('h2').find { |h2| h2.text.include? '代表变动情况' } or raise "Can't find section end"
+  section_end.xpath('.//following::*').remove
 
-  areas.each do |area|
-    ps = area.xpath('following-sibling::p | following-sibling::dl').slice_before { |e| e.name == 'dl' }.first
-    ps.each do |p|
-      p.css('a').each do |person|
-        data = {
-          name:     person.text,
-          wikiname: person.attr('class') == 'new' ? '' : person.attr('title'),
-          area:     area.css('dt').first.text.split('（').first.tidy,
-          term:     '12',
-        }
-        ScraperWiki.save_sqlite(%i(name wikiname area), data)
-      end
+  noko.css('dl dt').each do |area|
+    area.xpath('.//following::p').first.css('a').each do |person|
+      data = {
+        name:     person.text,
+        wikiname: person.attr('class') == 'new' ? '' : person.attr('title'),
+        area:     area.text.split('（').first.tidy,
+        term:     '12',
+      }
+      ScraperWiki.save_sqlite(%i(name wikiname area), data)
     end
   end
 end
